@@ -1,346 +1,259 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Cloud, Star } from "./Decor";
-import ositos from "../img/ositos.png";
-import ecografia from "../img/ecografia.jpg";
-import ositaNina from "../img/osita-nina.png";
-import ositoNino from "../img/osito-nino.png";
-import ositoLuna from "../img/osito-luna.png";
-import ositaArcoiris from "../img/osita-arcoiris.png";
-
-import "../style/fondo.css";
+import React, { useEffect, useState } from "react";
+import manzana from "../img/manzana.png";
+import corazonDragones from "../img/corazon-dragones.png";
+import emblemaMalefica from "../img/malefica.png";
+import espejoMagico from "../img/espejo.jpeg";
 import "../style/screentwo.css";
 
-const CANCION = "/indigo.mp3";
-const INICIO_CANCION = 15; // segundo desde el que arranca la canción
+// Sábado 14 de noviembre de 2026 (el mes empieza en 0: noviembre = 10).
+// Hora: 12 = 12:00 del mediodía (si fuera medianoche, poné 0 y cambiá HORA_TEXTO).
+const FECHA_EVENTO = new Date(2026, 10, 14, 12, 0, 0);
+const HORA_TEXTO = "12:00 hs";
 
-// Sábado 10 de octubre de 2026, 21:00 hs (el mes empieza en 0: octubre = 9)
-const FECHA_EVENTO = new Date(2026, 9, 10, 21, 0, 0);
+const UBICACION = "https://maps.app.goo.gl/uSs3sWW1ru9MhgY88";
 
-const UBICACION = "https://maps.app.goo.gl/RuSY168i4JD9iFSr8";
-
-// Números para confirmar asistencia: formato internacional sin "+" ni espacios
-const CONTACTOS = [
-  { nombre: "Abu Flavia", numero: "5493815112627" },
-  { nombre: "Abu Manuela", numero: "5493815220345" },
-];
-
-// Decoración del fondo: [top %, lado, distancia al borde %, tamaño máx px, retraso animación s]
-const NUBES = [
-  [1, "left", 3, 190, 0], [7, "right", 2, 150, -3], [14, "left", -2, 130, -6],
-  [21, "right", 5, 170, -2], [29, "left", 1, 150, -5], [36, "right", -3, 140, -7],
-  [43, "left", 4, 170, -1], [50, "right", 2, 150, -4], [57, "left", -1, 130, -8],
-  [64, "right", 4, 180, -3], [71, "left", 2, 150, -6], [78, "right", -2, 140, -2],
-  [85, "left", 5, 170, -5], [91, "right", 3, 150, -1], [97, "left", 10, 130, -4],
-];
-
-// [top %, lado, distancia al borde %, tamaño px, color]
-const ESTRELLAS = [
-  [2, "right", 24, 14, ""], [4, "left", 30, 8, "celeste"], [6, "left", 12, 10, "rosa"],
-  [9, "right", 8, 9, "celeste"], [11, "left", 22, 7, ""], [13, "right", 18, 12, "rosa"],
-  [16, "left", 6, 11, ""], [19, "right", 28, 7, "celeste"], [22, "left", 16, 13, "rosa"],
-  [25, "right", 10, 9, ""], [27, "left", 4, 8, "celeste"], [30, "right", 20, 11, ""],
-  [33, "left", 20, 9, "rosa"], [36, "right", 6, 13, "celeste"], [39, "left", 9, 10, ""],
-  [42, "right", 24, 8, "rosa"], [45, "left", 26, 7, "celeste"], [48, "right", 12, 12, ""],
-  [51, "left", 5, 9, "rosa"], [54, "right", 4, 8, ""], [57, "left", 18, 12, "celeste"],
-  [60, "right", 22, 9, "rosa"], [63, "left", 8, 7, ""], [66, "right", 14, 11, "celeste"],
-  [69, "left", 24, 9, ""], [72, "right", 7, 13, "rosa"], [75, "left", 3, 10, "celeste"],
-  [78, "right", 26, 8, ""], [81, "left", 14, 11, "rosa"], [84, "right", 10, 9, "celeste"],
-  [87, "left", 22, 8, ""], [90, "right", 18, 12, "rosa"], [93, "left", 7, 9, "celeste"],
-  [96, "right", 30, 10, ""], [98, "left", 28, 7, "rosa"],
-];
+// WhatsApp en formato internacional sin "+" ni espacios: 54 9 + código de área + número
+const WHATSAPP = "5493814124713";
 
 const MENSAJE_WSP = encodeURIComponent(
-  "¡Hola! Confirmo mi asistencia a la revelación de género 💗💙"
+  "¡Hola Pía!✨ Confirmo mi asistencia a tu cumpleaños 💜💚"
 );
 
+// Polvo de oro que sube: [left %, tamaño px, duración s, retraso s]
+const POLVO = Array.from({ length: 40 }, (_, i) => [
+  (i * 53 + 11) % 100,
+  1.5 + (i % 4) * 0.8,
+  9 + (i % 6) * 2,
+  -((i * 1.7) % 18),
+]);
+
+// Destellos alrededor del título: [top %, left %, tamaño px, retraso s]
+const DESTELLOS_TITULO = [
+  [4, 8, 18, -0.2], [14, 88, 24, -1.1], [38, 2, 14, -2.0], [46, 94, 16, -0.6],
+  [68, 12, 22, -1.6], [80, 84, 14, -2.4], [92, 40, 12, -0.9], [26, 60, 10, -1.9],
+];
+
+function Espejo({ children }) {
+  return (
+    <div className="s2-espejo">
+      <svg className="s2-espejo-marco" viewBox="0 0 240 300" aria-hidden="true">
+        <defs>
+          <linearGradient id="oroMarco" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#fff3c4" />
+            <stop offset="0.3" stopColor="#e3b64c" />
+            <stop offset="0.55" stopColor="#9c6f1c" />
+            <stop offset="0.8" stopColor="#f1cf6e" />
+            <stop offset="1" stopColor="#8a5f14" />
+          </linearGradient>
+          <radialGradient id="vidrio" cx="0.4" cy="0.35" r="0.75">
+            <stop offset="0" stopColor="#3d1a55" />
+            <stop offset="0.6" stopColor="#1d0a2b" />
+            <stop offset="1" stopColor="#0c0414" />
+          </radialGradient>
+        </defs>
+        {/* vidrio */}
+        <ellipse cx="120" cy="156" rx="88" ry="114" fill="url(#vidrio)" />
+        <ellipse className="s2-espejo-reflejo" cx="92" cy="110" rx="18" ry="54" />
+        {/* marco */}
+        <ellipse cx="120" cy="156" rx="94" ry="120" fill="none" stroke="url(#oroMarco)" strokeWidth="9" />
+        <ellipse cx="120" cy="156" rx="102" ry="128" fill="none" stroke="url(#oroMarco)" strokeWidth="2" />
+        <ellipse cx="120" cy="156" rx="86" ry="112" fill="none" stroke="url(#oroMarco)" strokeWidth="1.2" opacity="0.8" />
+        {/* cresta superior */}
+        <path
+          d="M120 4 Q128 18 142 20 Q132 26 134 38 Q126 30 120 36 Q114 30 106 38 Q108 26 98 20 Q112 18 120 4 Z"
+          fill="url(#oroMarco)"
+        />
+        <path d="M84 30 Q98 22 108 32 M156 30 Q142 22 132 32" fill="none" stroke="url(#oroMarco)" strokeWidth="2.5" strokeLinecap="round" />
+        {/* adorno inferior */}
+        <path
+          d="M120 296 Q128 284 140 282 Q130 278 128 268 Q124 276 120 274 Q116 276 112 268 Q110 278 100 282 Q112 284 120 296 Z"
+          fill="url(#oroMarco)"
+        />
+        {/* perlas laterales */}
+        <circle cx="18" cy="156" r="5" fill="url(#oroMarco)" />
+        <circle cx="222" cy="156" r="5" fill="url(#oroMarco)" />
+        <circle cx="40" cy="70" r="3.5" fill="url(#oroMarco)" />
+        <circle cx="200" cy="70" r="3.5" fill="url(#oroMarco)" />
+        <circle cx="40" cy="242" r="3.5" fill="url(#oroMarco)" />
+        <circle cx="200" cy="242" r="3.5" fill="url(#oroMarco)" />
+      </svg>
+      <div className="s2-espejo-contenido">{children}</div>
+    </div>
+  );
+}
+
+function Destello({ style, className = "" }) {
+  return (
+    <svg className={`s2-destello ${className}`} style={style} viewBox="0 0 20 20" aria-hidden="true">
+      <path d="M10 0 Q11 9 20 10 Q11 11 10 20 Q9 11 0 10 Q9 9 10 0 Z" />
+    </svg>
+  );
+}
+
+function Separador() {
+  return (
+    <div className="s2-separador" aria-hidden="true">
+      <span className="s2-sep-linea" />
+      <Destello className="s2-sep-estrella" />
+      <span className="s2-sep-linea" />
+    </div>
+  );
+}
+
 function ScreenTwo() {
-  const audioRef = useRef(null);
-  const [playing, setPlaying] = useState(false);
-  const [timeLeft, setTimeLeft] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  });
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  const [llego, setLlego] = useState(false);
 
   useEffect(() => {
     const eventDate = FECHA_EVENTO.getTime();
 
-    const updateCountdown = () => {
+    const update = () => {
       const distance = eventDate - Date.now();
-
-      if (distance < 0) {
+      if (distance <= 0) {
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        setLlego(true);
         return;
       }
-
       setTimeLeft({
-        days: Math.floor(distance / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-        minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
-        seconds: Math.floor((distance % (1000 * 60)) / 1000),
+        days: Math.floor(distance / 86400000),
+        hours: Math.floor((distance % 86400000) / 3600000),
+        minutes: Math.floor((distance % 3600000) / 60000),
+        seconds: Math.floor((distance % 60000) / 1000),
       });
     };
 
-    updateCountdown();
-    const interval = setInterval(updateCountdown, 1000);
-
+    update();
+    const interval = setInterval(update, 1000);
     return () => clearInterval(interval);
   }, []);
 
-  const pauseMusic = () => {
-    const audio = audioRef.current;
-    if (audio && !audio.paused) audio.pause();
-    setPlaying(false);
-  };
-
-  // Detiene la música al salir de la página, cambiar de pestaña o abrir WhatsApp
-  useEffect(() => {
-    const audio = audioRef.current;
-    const stop = () => {
-      if (audio && !audio.paused) audio.pause();
-      setPlaying(false);
-    };
-    const onVisibilityChange = () => {
-      if (document.hidden) stop();
-    };
-
-    document.addEventListener("visibilitychange", onVisibilityChange);
-    window.addEventListener("pagehide", stop);
-
-    return () => {
-      document.removeEventListener("visibilitychange", onVisibilityChange);
-      window.removeEventListener("pagehide", stop);
-      if (audio) audio.pause();
-    };
-  }, []);
-
-  const toggleMusic = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    if (audio.paused) {
-      if (audio.currentTime < INICIO_CANCION) audio.currentTime = INICIO_CANCION;
-      audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
-    } else {
-      audio.pause();
-      setPlaying(false);
-    }
-  };
-
   return (
-    <div className="s2-container fondo-revelacion">
-      {NUBES.map(([top, side, pos, size, delay], i) => (
-        <Cloud
-          key={`n${i}`}
-          className="s2-cloud"
-          style={{ top: `${top}%`, [side]: `${pos}%`, width: `clamp(${size * 0.6}px, ${size / 9}vw, ${size}px)`, animationDelay: `${delay}s` }}
-        />
-      ))}
-      {ESTRELLAS.map(([top, side, pos, size, color], i) => (
-        <Star
-          key={`e${i}`}
-          className={color}
-          style={{ top: `${top}%`, [side]: `${pos}%`, width: size, animationDelay: `${-(i % 7) * 0.5}s` }}
+    <div className="s2-escena">
+      {/* ---------- Fondo ---------- */}
+      <svg className="s2-humo s2-humo-1" aria-hidden="true">
+        <filter id="humoVerde1" x="0" y="0" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.006 0.011" numOctaves="4" seed="7" />
+          <feColorMatrix values="0 0 0 0 0.25  0 0 0 0 1  0 0 0 0 0.5  2.6 0 0 0 -1.25" />
+        </filter>
+        <rect width="100%" height="100%" filter="url(#humoVerde1)" />
+      </svg>
+      <svg className="s2-humo s2-humo-2" aria-hidden="true">
+        <filter id="humoVerde2" x="0" y="0" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.009 0.014" numOctaves="3" seed="23" />
+          <feColorMatrix values="0 0 0 0 0.45  0 0 0 0 1  0 0 0 0 0.6  2.4 0 0 0 -1.2" />
+        </filter>
+        <rect width="100%" height="100%" filter="url(#humoVerde2)" />
+      </svg>
+
+      {/* Emblemas de la película repartidos por el fondo */}
+      <img src={emblemaMalefica} alt="" aria-hidden="true" className="s2-emblema s2-malefica s2-malefica-1" />
+      <img src={corazonDragones} alt="" aria-hidden="true" className="s2-emblema s2-dragones s2-dragones-2" />
+      <img src={espejoMagico} alt="" aria-hidden="true" className="s2-emblema s2-espejo-deco" />
+
+      {POLVO.map(([left, size, dur, delay], i) => (
+        <span
+          key={i}
+          className="s2-polvo"
+          aria-hidden="true"
+          style={{
+            left: `${left}%`,
+            width: size,
+            height: size,
+            animationDuration: `${dur}s`,
+            animationDelay: `${delay}s`,
+          }}
         />
       ))}
 
-      <div className="s2-content">
-        {/* Encabezado */}
-        <header className="s2-section">
-          <span className="s2-ornament">✦ ✧ ✦</span>
-          <p className="s2-kicker">
-            <span className="s2-kicker-line" aria-hidden="true" />
-            <span className="s2-kicker-text">Mi revelación de</span>
-            <span className="s2-kicker-line" aria-hidden="true" />
-          </p>
-          <h1 className="s2-script s2-hero">Género</h1>
+      {/* ---------- Contenido ---------- */}
+      <main className="s2-contenido">
+        <header className="s2-header">
+          <Espejo>
+            <img src={manzana} alt="Manzana dorada" className="s2-manzana" />
+          </Espejo>
+
+          <div className="s2-titulo-wrap">
+            {DESTELLOS_TITULO.map(([top, left, size, delay], i) => (
+              <Destello
+                key={i}
+                style={{ top: `${top}%`, left: `${left}%`, width: size, height: size, animationDelay: `${delay}s` }}
+              />
+            ))}
+
+            <p className="s2-pre">Te invito a mi</p>
+            <h1 className="s2-titulo oro-lujo">Cumpleaños</h1>
+            <div className="s2-doce oro-lujo" aria-label="número 12">12</div>
+            <h2 className="s2-nombre oro-lujo">Pía</h2>
+          </div>
         </header>
 
-        {/* Música */}
-        <section className="s2-section">
-          <audio
-            ref={audioRef}
-            src={`${CANCION}#t=${INICIO_CANCION}`}
-            preload="metadata"
-            onEnded={(e) => {
-              // al terminar vuelve a empezar desde el segundo 15
-              e.currentTarget.currentTime = INICIO_CANCION;
-              e.currentTarget.play().catch(() => setPlaying(false));
-            }}
-          />
-          <button
-            className={`s2-music ${playing ? "is-playing" : ""}`}
-            onClick={toggleMusic}
-            aria-label={playing ? "Pausar canción" : "Reproducir canción"}
-          >
-            <span className="s2-music-icon" aria-hidden="true">
-              {playing ? "❚❚" : "▶"}
-            </span>
-          </button>
-          <p className="s2-music-label">{playing ? "Sonando…" : "Dale play a mi canción"}</p>
-        </section>
+        <Separador />
 
-        {/* Papás */}
-        <section className="s2-section">
-          <p className="s2-label">Mis papis</p>
-          <h2 className="s2-parents">
-            Cami <span className="s2-amp">&</span> Nacho
-          </h2>
-          <p className="s2-text">
-            Hace meses vengo creciendo dentro de mami y acompañandome del amor de papi.
-            Ellos quieren que seas parte de este momento tan especial.
+        <section className="s2-seccion">
+          <p className="s2-texto">
+            Los momentos más lindos se disfrutan con personas especiales.
+          </p>
+          <p className="s2-texto s2-texto-suave">
+            Vení con tu mejor onda y preparate para bailar,
+            sacarnos mil fotos y pasarla increíble.
+            ¡Sin vos no es lo mismo!
           </p>
         </section>
 
-        {/* Ecografía */}
-        <section className="s2-section">
-          <figure className="s2-polaroid">
-            <span className="s2-tape s2-tape-left" aria-hidden="true" />
-            <span className="s2-tape s2-tape-right" aria-hidden="true" />
-            <div className="s2-polaroid-photo">
-              <img src={ecografia} alt="Ecografía del bebé" />
-            </div>
-            <figcaption className="s2-script">Mi primera foto ♡</figcaption>
-          </figure>
-        </section>
-
-        {/* Ositos + pregunta */}
-        <section className="s2-section">
-          <img src={ositos} alt="Ositos con globos rosa y celeste" className="s2-ositos" />
-          <h2 className="s2-question">
-            ¿<span className="s2-nino">Niño</span> o <span className="s2-nina">Niña</span>?
-          </h2>
-          <p className="s2-text s2-text-italic">¿Qué crees que soy?</p>
-        </section>
-
-        {/* Teams */}
-        <section className="s2-section">
-          <div className="s2-teams">
-            <div className="s2-team s2-team-nina">
-              <img src={ositaNina} alt="Osita con vestido rosa" className="s2-team-img" />
-              <p className="s2-team-label">Si eres</p>
-              <h3 className="s2-script">Team Niña</h3>
-              <p className="s2-team-sub">Trae uno de estos regalitos(Opciones)</p>
-              <ul>
-                <li>Toallitas húmedas</li>
-                <li>Perfume</li>
-              </ul>
-            </div>
-            <div className="s2-team s2-team-nino">
-              <img src={ositoNino} alt="Osito con pijama celeste" className="s2-team-img" />
-              <p className="s2-team-label">Si eres</p>
-              <h3 className="s2-script">Team Niño</h3>
-              <p className="s2-team-sub">Trae uno de estos regalitos(Opciones)</p>
-              <ul>
-                <li>Pañales</li>
-                <li>Shampoo</li>
-              </ul>
-            </div>
+        <section className="s2-tarjeta">
+          <p className="s2-etiqueta">Agenda esta fecha</p>
+          <div className="s2-fecha">
+            <span className="s2-fecha-lado">Sábado</span>
+            <span className="s2-fecha-dia oro">14</span>
+            <span className="s2-fecha-lado">Noviembre</span>
           </div>
+          <p className="s2-hora">{HORA_TEXTO}</p>
 
-          {/* Código de vestimenta */}
-          <div className="s2-dress">
-            <p className="s2-label">Código de vestimenta</p>
-            <h3 className="s2-script s2-dress-title">Ven con los colores de tu team</h3>
-            <p className="s2-text">
-              Suma a tu look una prenda o un accesorio del color de lo que crees que soy
-            </p>
-            <div className="s2-dress-options">
-              <span className="s2-dress-pill s2-dress-nina">
-                <span className="s2-dress-dot" aria-hidden="true" /> Rosa · Team Niña
-              </span>
-              <span className="s2-dress-pill s2-dress-nino">
-                <span className="s2-dress-dot" aria-hidden="true" /> Celeste · Team Niño
-              </span>
-            </div>
-            <p className="s2-dress-ideas">
-              Una remera, un moño, una vincha, un pañuelo, unos aros… ¡lo que más te guste!
-            </p>
-          </div>
-        </section>
-
-        {/* Día y lugar */}
-        <section className="s2-section">
-          <div className="s2-info">
-            <div className="s2-info-card s2-info-cuando">
-              <img src={ositoLuna} alt="" aria-hidden="true" className="s2-info-img" />
-              <p className="s2-label">Cuándo</p>
-              <div className="s2-calendar">
-                <span className="s2-calendar-side">Sábado</span>
-                <span className="s2-calendar-day">10</span>
-                <span className="s2-calendar-side">Octubre</span>
-              </div>
-              <p className="s2-calendar-year">2026</p>
-              <p className="s2-hour">
-                <span aria-hidden="true">☾</span> 21:00 hs
-              </p>
-            </div>
-
-            <div className="s2-info-card s2-info-donde">
-              <img src={ositaArcoiris} alt="" aria-hidden="true" className="s2-info-img" />
-              <p className="s2-label">Dónde</p>
-              <p className="s2-script s2-place">En casa de mi papi</p>
-              <p className="s2-address">Ing. La Florida · Tucumán 200</p>
-              <p className="s2-place-sub">te esperamos para celebrar juntos</p>
-              <a className="s2-btn" href={UBICACION} target="_blank" rel="noopener noreferrer" onClick={pauseMusic}>
-                Ver ubicación
-              </a>
-            </div>
-          </div>
-        </section>
-
-        {/* Cuenta regresiva */}
-        <section className="s2-section">
-          <p className="s2-label">Faltan</p>
-          <div className="s2-countdown">
+          <p className="s2-etiqueta s2-etiqueta-faltan">
+            {llego ? "Hoy es el gran día" : "Faltan"}
+          </p>
+          <div className="s2-cuenta">
             {[
               [timeLeft.days, "Días"],
               [timeLeft.hours, "Horas"],
-              [timeLeft.minutes, "Min"],
-              [timeLeft.seconds, "Seg"],
-            ].map(([value, label]) => (
-              <div className="s2-count" key={label}>
-                <span className="s2-count-num">{String(value).padStart(2, "0")}</span>
-                <span className="s2-count-label">{label}</span>
+              [timeLeft.minutes, "Minutos"],
+              [timeLeft.seconds, "Segundos"],
+            ].map(([valor, label]) => (
+              <div className="s2-cuenta-item" key={label}>
+                <span className="s2-cuenta-num">{String(valor).padStart(2, "0")}</span>
+                <span className="s2-cuenta-label">{label}</span>
               </div>
             ))}
           </div>
-          <p className="s2-script s2-welcome">¡Te esperamos con mucha alegría!</p>
         </section>
 
-        {/* Confirmar asistencia */}
-        <section className="s2-section">
-          <p className="s2-label">Confirma tu asistencia</p>
-          <p className="s2-text">
-           Hasta el día miércoles 07/10/2026
-          </p>
-          <div className="s2-rsvp">
-            {CONTACTOS.map(({ nombre, numero }) =>
-              numero ? (
-                <a
-                  key={nombre}
-                  className="s2-btn"
-                  href={`https://api.whatsapp.com/send?phone=${numero}&text=${MENSAJE_WSP}`}
-                  target="_blank"
-                  onClick={pauseMusic}
-                  rel="noopener noreferrer"
-                >
-                  {nombre}
-                </a>
-              ) : (
-                <span key={nombre} className="s2-btn is-disabled">
-                  {nombre}
-                </span>
-              )
-            )}
-          </div>
-          <p className="s2-rsvp-hint">
-            Toca un nombre y se abrirá WhatsApp con tu confirmación lista para enviar 
-          </p>
+        <section className="s2-tarjeta">
+          <p className="s2-etiqueta">Lugar</p>
+          <p className="s2-texto s2-texto-suave">Seguí el camino encantado hasta la fiesta.</p>
+          <a className="s2-btn" href={UBICACION} target="_blank" rel="noopener noreferrer">
+            Ver ubicación
+          </a>
         </section>
-      </div>
 
-      
+        <section className="s2-tarjeta">
+          <p className="s2-etiqueta">Confirmá tu asistencia</p>
+          <p className="s2-texto s2-texto-suave">Tu lugar en la fiesta te espera.</p>
+          <a
+            className="s2-btn s2-btn-verde"
+            href={`https://api.whatsapp.com/send?phone=${WHATSAPP}&text=${MENSAJE_WSP}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Confirmar por WhatsApp
+          </a>
+        </section>
+
+        <Separador />
+
+        <footer className="s2-final">
+          <p className="s2-firma oro">con cariño, Pía</p>
+        </footer>
+      </main>
     </div>
   );
 }
