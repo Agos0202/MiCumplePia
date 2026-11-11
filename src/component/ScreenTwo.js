@@ -11,7 +11,10 @@ import "../style/screentwo.css";
 const FECHA_EVENTO = new Date(2026, 10, 14, 12, 0, 0);
 const HORA_TEXTO = "12:00 hs";
 
-const UBICACION = "https://maps.app.goo.gl/uSs3sWW1ru9MhgY88";
+// Abre Google Maps directamente con "Cómo llegar" desde donde esté la persona.
+// Coordenadas sacadas del link https://maps.app.goo.gl/uSs3sWW1ru9MhgY88
+const DESTINO = "-26.8143556,-65.0819989";
+const UBICACION = `https://www.google.com/maps/dir/?api=1&destination=${DESTINO}`;
 
 // WhatsApp en formato internacional sin "+" ni espacios: 54 9 + código de área + número
 const WHATSAPP = "5493814124713";
