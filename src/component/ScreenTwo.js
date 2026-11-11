@@ -3,6 +3,7 @@ import manzana from "../img/manzana.png";
 import corazonDragones from "../img/corazon-dragones.png";
 import emblemaMalefica from "../img/malefica.png";
 import espejoMagico from "../img/espejo.jpeg";
+import { obtenerAudio, reproducir, pausar } from "./musica";
 import "../style/screentwo.css";
 
 // Sábado 14 de noviembre de 2026 (el mes empieza en 0: noviembre = 10).
@@ -127,8 +128,65 @@ function ScreenTwo() {
     return () => clearInterval(interval);
   }, []);
 
+  // ---------- Música ----------
+  const [sonando, setSonando] = useState(() => {
+    const a = obtenerAudio();
+    return !!a && !a.paused;
+  });
+
+  useEffect(() => {
+    const a = obtenerAudio();
+    if (!a) return;
+    const onPlay = () => setSonando(true);
+    const onPause = () => setSonando(false);
+    a.addEventListener("play", onPlay);
+    a.addEventListener("pause", onPause);
+
+    // Por si no arrancó con el toque del libro, se intenta al entrar
+    if (a.paused) reproducir();
+
+    // Se pausa al cambiar de pestaña, cerrar o abrir WhatsApp / Maps
+    const onVisibilidad = () => {
+      if (document.hidden) pausar();
+    };
+    document.addEventListener("visibilitychange", onVisibilidad);
+    window.addEventListener("pagehide", pausar);
+
+    return () => {
+      a.removeEventListener("play", onPlay);
+      a.removeEventListener("pause", onPause);
+      document.removeEventListener("visibilitychange", onVisibilidad);
+      window.removeEventListener("pagehide", pausar);
+    };
+  }, []);
+
+  const alternarMusica = () => {
+    const a = obtenerAudio();
+    if (!a) return;
+    if (a.paused) reproducir();
+    else pausar();
+  };
+
   return (
     <div className="s2-escena">
+      <button
+        type="button"
+        className={`s2-musica ${sonando ? "sonando" : ""}`}
+        onClick={alternarMusica}
+        aria-label={sonando ? "Pausar música" : "Reproducir música"}
+      >
+        <span className="s2-musica-icono" aria-hidden="true">
+          {sonando ? (
+            <svg viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1" /><rect x="14" y="5" width="4" height="14" rx="1" /></svg>
+          ) : (
+            <svg viewBox="0 0 24 24"><path d="M8 5 L19 12 L8 19 Z" /></svg>
+          )}
+        </span>
+        <span className="s2-musica-barras" aria-hidden="true">
+          <i /><i /><i /><i />
+        </span>
+      </button>
+
       {/* ---------- Fondo ---------- */}
       <svg className="s2-humo s2-humo-1" aria-hidden="true">
         <filter id="humoVerde1" x="0" y="0" width="100%" height="100%">

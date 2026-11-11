@@ -1,6 +1,7 @@
 import React, { useMemo, useRef, useState } from "react";
 import "../style/screenone.css";
 import manzana from "../img/manzana.png";
+import { reproducir } from "./musica";
 
 // Tiempos de la animación (ms)
 const HUMO_DESDE = 700; // cuándo empieza a salir el humo después del clic
@@ -43,6 +44,7 @@ function ScreenOne({ onEnter }) {
   const abrirLibro = () => {
     if (yaClic.current) return;
     yaClic.current = true;
+    reproducir(); // arranca la canción con este toque
     setAbierto(true);
     setTimeout(() => setHumo(true), HUMO_DESDE);
     setTimeout(() => onEnter(), CAMBIO_PANTALLA);

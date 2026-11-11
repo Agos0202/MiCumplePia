@@ -108,6 +108,82 @@ body {
   50% { opacity: 1; }
 }
 
+/* ---------- Botón de música (fijo abajo a la derecha) ---------- */
+.s2-musica {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 52px;
+  padding: 0 18px 0 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(227, 182, 76, 0.75);
+  background: linear-gradient(160deg, rgba(60, 20, 86, 0.92), rgba(24, 7, 36, 0.92));
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow:
+    0 0 0 4px rgba(227, 182, 76, 0.12),
+    0 8px 24px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.s2-musica:hover,
+.s2-musica:focus-visible {
+  outline: none;
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 0 4px rgba(227, 182, 76, 0.25),
+    0 0 22px rgba(227, 182, 76, 0.45),
+    0 10px 26px rgba(0, 0, 0, 0.5);
+}
+
+.s2-musica-icono {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #fff1bf, #e3b64c 45%, #9c6f1c);
+}
+
+.s2-musica-icono svg {
+  width: 16px;
+  height: 16px;
+  fill: #2a0b3f;
+}
+
+.s2-musica-barras {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 18px;
+}
+
+.s2-musica-barras i {
+  width: 3px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--oro);
+  transition: height 0.3s ease;
+}
+
+.s2-musica.sonando .s2-musica-barras i {
+  animation: s2-barra 0.9s ease-in-out infinite;
+}
+.s2-musica.sonando .s2-musica-barras i:nth-child(2) { animation-delay: -0.3s; }
+.s2-musica.sonando .s2-musica-barras i:nth-child(3) { animation-delay: -0.6s; }
+.s2-musica.sonando .s2-musica-barras i:nth-child(4) { animation-delay: -0.15s; }
+
+@keyframes s2-barra {
+  0%, 100% { height: 4px; }
+  50% { height: 18px; }
+}
+
 /* ---------- Polvo de oro ---------- */
 .s2-polvo {
   position: absolute;
