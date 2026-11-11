@@ -122,7 +122,7 @@
 }
 
 .abierto .s1-pagina-brillo {
-  animation: s1-brillo 1.4s 0.5s ease-out forwards;
+  animation: s1-brillo 0.9s 0.2s ease-out forwards;
 }
 
 @keyframes s1-brillo {
@@ -135,7 +135,7 @@
   inset: 0;
   transform-origin: left center;
   transform-style: preserve-3d;
-  transition: transform 1.4s cubic-bezier(0.55, 0, 0.25, 1);
+  transition: transform 0.9s cubic-bezier(0.55, 0, 0.25, 1);
   z-index: 2;
 }
 
@@ -305,7 +305,7 @@
   inset: 0;
   background: radial-gradient(circle at 50% 50%, rgba(150, 255, 160, 0.9), rgba(30, 150, 70, 0.85) 70%);
   opacity: 0;
-  animation: s1-velo 1.9s 0.4s ease-in forwards;
+  animation: s1-velo 1s 0.2s ease-in forwards;
 }
 
 @keyframes s1-velo {

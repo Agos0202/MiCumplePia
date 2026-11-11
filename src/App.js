@@ -17,7 +17,7 @@ function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 1 }}
+            transition={{ duration: 0.6 }}
           >
             {/* ScreenOne recibe una función para pasar a la siguiente pantalla */}
             <ScreenOne onEnter={() => setShowScreenTwo(true)} />
@@ -28,7 +28,7 @@ function App() {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -50 }}
-            transition={{ duration: 1 }}
+            transition={{ duration: 0.6 }}
           >
             <ScreenTwo />
           </motion.div>

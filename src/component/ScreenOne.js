@@ -4,8 +4,8 @@ import manzana from "../img/manzana.png";
 import { reproducir } from "./musica";
 
 // Tiempos de la animación (ms)
-const HUMO_DESDE = 700; // cuándo empieza a salir el humo después del clic
-const CAMBIO_PANTALLA = 2600; // cuándo se pasa a la segunda pantalla
+const HUMO_DESDE = 350; // cuándo empieza a salir el humo después del clic
+const CAMBIO_PANTALLA = 1500; // cuándo se pasa a la segunda pantalla
 
 const CANT_HUMO = 34;
 
@@ -19,8 +19,8 @@ function crearHumo() {
       x: Math.cos(angulo) * distancia,
       y: Math.sin(angulo) * distancia - 10, // el humo tiende a subir
       size: 18 + Math.random() * 30, // en vmax
-      delay: Math.random() * 0.9,
-      dur: 1.6 + Math.random() * 1.2,
+      delay: Math.random() * 0.4,
+      dur: 1 + Math.random() * 0.6,
       rot: Math.random() * 360,
       tono: Math.random() < 0.5 ? "a" : Math.random() < 0.5 ? "b" : "c",
     };
